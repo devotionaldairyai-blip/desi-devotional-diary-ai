@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#21103d">
+<title>DesiDevotionalDiaryAI Player</title>
+<style>
+:root{--bg:#100a22;--panel:#211538;--panel2:#2b1c45;--gold:#ffd36b;--gold2:#f5a623;--text:#fff8ee;--muted:#d1c5e2;--line:#59456f}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 50% -10%,#563079 0,#211039 42%,var(--bg) 78%);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--text);min-height:100vh}
+header{text-align:center;padding:26px 18px 22px;background:linear-gradient(150deg,#35134f,#15102f 75%);border-bottom:1px solid #715238}
+.logo{width:126px;height:126px;display:block;margin:0 auto 12px;filter:drop-shadow(0 6px 18px #e9a52a55)}
+h1{font-size:23px;line-height:1.25;margin:6px 0;color:var(--gold);letter-spacing:.2px}
+header p{margin:7px 0 0;color:#e7d9f4;font-size:14px}
+.wrap{max-width:760px;margin:auto;padding:16px}
+.card{background:linear-gradient(160deg,#291a40,#1b122d);border:1px solid var(--line);border-radius:18px;padding:17px;margin:0 0 15px;box-shadow:0 8px 24px #0003}
+h2{font-size:18px;margin:0 0 9px;color:var(--gold)}
+.hint{font-size:13px;color:var(--muted);line-height:1.55;margin:5px 0 12px}
+input[type=text]{width:100%;border:1px solid #745d8c;background:#130d22;color:white;border-radius:11px;padding:13px;font-size:15px;margin:5px 0 10px}
+button,.filelabel{display:inline-block;border:0;border-radius:12px;padding:12px 15px;background:linear-gradient(135deg,#ffdb82,#e8a42a);color:#29143d;font-size:14px;font-weight:750;cursor:pointer;text-align:center}
+button.secondary{background:#443057;color:#fff5dc;border:1px solid #715a86}
+button:disabled{opacity:.45}
+.filelabel{display:block;margin:8px 0 12px}
+input[type=file]{position:absolute;width:1px;height:1px;opacity:0}
+.row{display:flex;gap:9px;flex-wrap:wrap}
+.row button{flex:1;min-width:120px}
+.category-list button{min-width:135px}
+.empty{color:var(--muted);font-size:14px;padding:8px 0}
+.track{padding:12px 4px;border-bottom:1px solid #49355e;display:flex;align-items:center;gap:10px}
+.track:last-child{border-bottom:0}
+.trackname{flex:1;min-width:0;overflow-wrap:anywhere;font-size:14px}
+.track button{padding:9px 12px;flex:0 0 auto}
+.now{color:var(--gold);font-size:13px;margin:10px 0 0;overflow-wrap:anywhere}
+audio{width:100%;margin-top:12px}
+#ytplayer{width:100%;aspect-ratio:16/9;margin-top:12px;border-radius:12px;overflow:hidden;background:#0b0712}
+#ytplayer iframe{width:100%;height:100%;border:0}
+footer{text-align:center;color:#b9a8cf;font-size:12px;padding:8px 15px 28px}
+.small{font-size:12px;color:var(--muted)}
+@media(min-width:600px){header{padding:30px 20px}.logo{width:145px;height:145px}h1{font-size:27px}.wrap{padding:20px}}
+</style>
+</head>
+<body>
+<header>
+  <img class="logo" src="./app-logo.png" alt="DesiDevotionalDiaryAI golden lotus diya logo">
+  <h1>DesiDevotionalDiaryAI</h1>
+  <p>आपकी भक्ति · आपके भजन · आपकी साधना</p>
+</header>
+
+<main class="wrap">
+  <section class="card">
+    <h2>🎵 My MP3 Bhajans</h2>
+    <p class="hint">अपने Android फोन से एक या अधिक MP3 फ़ाइलें चुनें। फ़ाइलें आपके डिवाइस पर ही रहेंगी; इस पेज पर इन्हें अपलोड नहीं किया जाता।</p>
+    <label class="filelabel" for="mp3files">＋ फोन से MP3 चुनें</label>
+    <input id="mp3files" type="file" accept="audio/*,.mp3" multiple>
+    <div id="mp3list" class="empty">अभी कोई MP3 नहीं चुना गया।</div>
+    <div id="currentTrack" class="now"></div>
+    <audio id="audio" controls preload="metadata"></audio>
+    <div class="row" style="margin-top:10px">
+      <button id="prev" class="secondary" type="button">⏮ Previous</button>
+      <button id="next" type="button">Next ⏭</button>
+    </div>
+    <p class="small">नोट: ब्राउज़र बंद करने के बाद फ़ाइलें दोबारा चुननी पड़ सकती हैं।</p>
+  </section>
+
+  <section class="card">
+    <h2>▶ YouTube Bhakti Tracks</h2>
+    <p class="hint">अपने प्रकाशित YouTube भजन या मंत्र का लिंक यहाँ डालें। वीडियो चलाने के लिए इंटरनेट और YouTube playback की अनुमति आवश्यक है।</p>
+    <input id="yturl" type="text" inputmode="url" placeholder="YouTube URL यहाँ paste करें">
+    <div class="row">
+      <button id="playyt" type="button">भजन चलाएँ</button>
+      <button id="channel" class="secondary" type="button">मेरा चैनल खोलें</button>
+    </div>
+    <div id="ytstatus" class="hint" aria-live="polite"></div>
+    <div id="ytplayer"></div>
+  </section>
+
+  <section class="card">
+    <h2>🪷 आपकी भक्ति लाइब्रेरी</h2>
+    <p class="hint">अपनी भक्ति के अनुसार श्रेणी चुनें।</p>
+    <div class="row category-list">
+      <button class="secondary" type="button" data-category="श्रीकृष्ण भजन">🦚 श्रीकृष्ण भजन</button>
+      <button class="secondary" type="button" data-category="शिव भजन">🔱 शिव भजन</button>
+      <button class="secondary" type="button" data-category="माता रानी भजन">🪷 माता रानी भजन</button>
+      <button class="secondary" type="button" data-category="मंत्र एवं ध्यान">🕉️ मंत्र एवं ध्यान</button>
+      <button class="secondary" type="button" data-category="श्रीहरि विष्णु भजन">🙏 श्रीहरि विष्णु भजन</button>
+      <button class="secondary" type="button" data-category="हनुमान जी भजन">🚩 हनुमान जी भजन</button>
+      <button class="secondary" type="button" data-category="महादेव भजन">🔱 महादेव भजन</button>
+    </div>
+    <p id="categoryStatus" class="small" aria-live="polite">किसी श्रेणी को चुनें। उसमें भजन चलाने के लिए संबंधित YouTube लिंक ऊपर डालें या MP3 फ़ाइलें चुनें।</p>
+  </section>
+</main>
+<footer>शांति · श्रद्धा · संगीत 🙏</footer>
+
+<script>
+(() => {
+  const picker = document.getElementById('mp3files');
+  const list = document.getElementById('mp3list');
+  const audio = document.getElementById('audio');
+  const current = document.getElementById('currentTrack');
+  let tracks = [];
+  let index = -1;
+  let activeUrl = '';
+
+  function playIndex(i) {
+    if (!tracks.length) return;
+    index = (i + tracks.length) % tracks.length;
+    if (activeUrl) URL.revokeObjectURL(activeUrl);
+    activeUrl = URL.createObjectURL(tracks[index]);
+    audio.src = activeUrl;
+    current.textContent = 'अब चल रहा है: ' + tracks[index].name;
+    audio.play().catch(() => { current.textContent = 'ट्रैक चुना गया: ' + tracks[index].name + ' — चलाने के लिए Play दबाएँ।'; });
+    renderList();
+  }
+  function renderList() {
+    list.innerHTML = '';
+    if (!tracks.length) {
+      list.className = 'empty';
+      list.textContent = 'अभी कोई MP3 नहीं चुना गया।';
+      return;
+    }
+    list.className = '';
+    tracks.forEach((file, i) => {
+      const row = document.createElement('div');
+      row.className = 'track';
+      const name = document.createElement('div');
+      name.className = 'trackname';
+      name.textContent = (i === index ? '♪ ' : '') + file.name;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = 'Play';
+      btn.addEventListener('click', () => playIndex(i));
+      row.append(name, btn);
+      list.appendChild(row);
+    });
+  }
+  picker.addEventListener('change', () => {
+    tracks = Array.from(picker.files || []);
+    index = -1;
+    renderList();
+    if (tracks.length) playIndex(0);
+  });
+  document.getElementById('prev').addEventListener('click', () => { if (tracks.length) playIndex(index <= 0 ? tracks.length - 1 : index - 1); });
+  document.getElementById('next').addEventListener('click', () => { if (tracks.length) playIndex(index + 1); });
+  audio.addEventListener('ended', () => { if (tracks.length > 1) playIndex(index + 1); });
+
+  function extractId(raw) {
+    try {
+      const u = new URL(raw.trim());
+      if (u.hostname === 'youtu.be' || u.hostname.endsWith('.youtu.be')) return u.pathname.split('/').filter(Boolean)[0] || '';
+      if (u.hostname.includes('youtube.com') || u.hostname.includes('youtube-nocookie.com')) {
+        if (u.searchParams.get('v')) return u.searchParams.get('v');
+        const parts = u.pathname.split('/').filter(Boolean);
+        const marker = parts.findIndex(p => ['embed','shorts','live'].includes(p));
+        if (marker >= 0) return parts[marker + 1] || '';
+      }
+    } catch (e) {}
+    return '';
+  }
+  document.getElementById('playyt').addEventListener('click', () => {
+    const raw = document.getElementById('yturl').value;
+    const id = extractId(raw);
+    const target = document.getElementById('ytplayer');
+    const status = document.getElementById('ytstatus');
+    target.innerHTML = '';
+    if (!id) {
+      status.textContent = 'कृपया सही YouTube वीडियो लिंक डालें (youtube.com या youtu.be)।';
+      return;
+    }
+    const iframe = document.createElement('iframe');
+    iframe.title = 'YouTube Bhakti Track';
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+    iframe.allowFullscreen = true;
+    iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+    iframe.src = 'https://www.youtube.com/embed/' + encodeURIComponent(id);
+    target.appendChild(iframe);
+    status.textContent = 'वीडियो लोड हो रहा है। यदि playback उपलब्ध न हो, तो वीडियो YouTube ऐप में खोलें।';
+  });
+  document.querySelectorAll('[data-category]').forEach(button => {
+    button.addEventListener('click', () => {
+      document.getElementById('categoryStatus').textContent = 'चुनी गई श्रेणी: ' + button.dataset.category + ' — अब इस श्रेणी का भजन ऊपर YouTube लिंक से चलाएँ या MP3 चुनें।';
+      document.getElementById('yturl').focus();
+    });
+  });
+  document.getElementById('channel').addEventListener('click', () => {
+    // Navigate in the same tab to avoid popup blockers in Android in-app browsers.
+    window.location.href = 'https://youtube.com/@desidevitionaldiary';
+  });
+})();
+</script>
+</body>
+</html>
